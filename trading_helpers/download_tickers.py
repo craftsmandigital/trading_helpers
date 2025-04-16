@@ -69,7 +69,7 @@ def fetch_and_save_tickers(tickers, output_dir):
     pbar = tqdm.tqdm(
         desc="Processing data", unit="item", miniters=100, total=len(tickers)
     )
-    return
+    # return
     for ticker in tickers:
         try:
             # print(f"Fetching data for {ticker}...")
