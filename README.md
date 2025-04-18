@@ -15,6 +15,10 @@ pip install git+https://github.com/craftsmandigital/trading_helpers.git
 ## Usage
 
 ``` python
+from trading_helpers import TradingData
+```
+
+``` python
 # Import specific items
 import polars as pl
 from polars.datatypes import Date

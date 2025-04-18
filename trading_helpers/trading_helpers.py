@@ -20,7 +20,7 @@ class TradingData:
         dataFolder: str,
         yfinanceFilesFolder: str,
         tickersFileName: str,
-        tickersColumn: str = "Symbol",
+        tickersColumn: str = "Ticker",
         tickersURL: str = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
     ):
         """
@@ -55,6 +55,16 @@ class TradingData:
         self._save_ticker_table(equity_table, self._tickerListFile)
         self._fetch_and_save_tickers(
             equity_table[self._tickersColumn].tolist(), self._tickerFolder
+        )
+
+    def download_tickers(self):
+        equity_table = self.load_sector_parquet_file().collect()
+        # print(equity_table[self._tickersColumn].to_list())
+        # return
+
+        # self._save_ticker_table(equity_table, self._tickerListFile)
+        self._fetch_and_save_tickers(
+            equity_table[self._tickersColumn].to_list(), self._tickerFolder
         )
 
     # Fetch S&P 500 tickers
@@ -111,7 +121,7 @@ class TradingData:
     def _save_ticker_table(self, data, filename):
         if not data.empty:
             # Save table as Parquet file
-            data.to_parquet(filename)
+            data.to_csv(filename, sep=";", index=False)
             print(f"Saved Ticker description list to {filename}")
         else:
             print("No data found for Ticker description list.")
@@ -153,11 +163,9 @@ class TradingData:
         ]
         return pl.concat(lazy_frames)
 
-    def load_sector_parquet_file(
-        self,
-        parquet_file: Path = None,
-    ) -> pl.LazyFrame:
-
+    def load_sector_parquet_file(self, parquet_file: Path = None) -> pl.LazyFrame:
         if parquet_file is None:
             parquet_file = (Path(self._tickerListFile),)
-        return pl.scan_parquet(parquet_file)
+        return pl.scan_csv(
+            parquet_file, separator=";", has_header=True, ignore_errors=False
+        )
